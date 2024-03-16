@@ -5,6 +5,7 @@ import "flatpickr/dist/themes/light.css";
 import "react-svg-map/lib/index.css";
 import "leaflet/dist/leaflet.css";
 import "./scss/app.scss";
+import "./ntl.css";
 import { Provider } from "react-redux";
 import store from "../store";
 import { SessionProvider } from "next-auth/react";

@@ -1,0 +1,343 @@
+body {
+  overflow: hidden;
+}
+
+.css-mxtnkz-MuiTableContainer-root {
+  max-height: clamp(
+    calc(100vh - 349px),
+    calc(100vh - 349px),
+    9999px
+  ) !important;
+}
+.ant-btn-primary {
+  background-color: #1677ff;
+}
+
+/* Detail assets  */
+.box.box-primary {
+  border-top-color: #3c8dbc;
+}
+
+.box {
+  position: relative;
+  border-radius: 3px;
+  background: #ffffff;
+  border-top: 3px solid #d2d6de;
+  margin-bottom: 20px;
+  width: 100%;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.box-body {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  padding: 10px;
+}
+
+.table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+tbody {
+  display: table-row-group;
+  vertical-align: middle;
+  border-color: inherit;
+}
+
+/* .table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+} */
+
+tr {
+  display: table-row;
+  vertical-align: inherit;
+  border-color: inherit;
+}
+
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  border-top: 1px solid #f4f4f4;
+}
+
+.box-header {
+  color: #444;
+  display: block;
+  padding: 10px;
+  position: relative;
+}
+
+.box-header > .fa,
+.box-header > .glyphicon,
+.box-header > .ion,
+.box-header .box-title {
+  display: inline-block;
+  font-size: 18px;
+  margin: 0;
+  line-height: 1;
+}
+
+.table-bordered {
+  border: 1px solid #f4f4f4;
+}
+
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+  vertical-align: middle;
+}
+
+.dark {
+  color: white;
+  background-color: rgb(30 41 59);
+}
+
+.dark .box {
+  background: rgb(30 41 59);
+}
+
+/* Music  */
+.ant-menu {
+  background-color: #343a40 !important;
+}
+.namedm {
+  margin: 22px 0px 0px 140px;
+}
+
+/* Css music */
+.open-modal-music {
+  position: fixed;
+  bottom: -2px;
+  width: 45px;
+  height: 45px;
+  border-radius: 100%;
+  right: 70px;
+  transform: translateY(-50%);
+}
+
+/* thumbnail quay tròn  */
+.body_music_image {
+  position: absolute;
+  opacity: 0.5;
+  height: 150px;
+  width: 150px;
+  overflow: hidden;
+  border-radius: 50%;
+  animation: spin 5s linear infinite;
+  margin-left: 20%;
+  z-index: 0;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* list nhạc hiện lên trên thumbnail  */
+.body_music_list {
+  position: relative;
+  z-index: 1;
+}
+
+/* .ant-modal-content {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+.ant-modal-header {
+  margin-top: 30px;
+}
+.ant-modal-footer {
+  margin-top: 5px !important;
+  margin-right: 45px;
+} */
+
+/* Tên bài hát chạy  */
+.namesong {
+  animation: tenbaihatchay 5s linear infinite alternate;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  position: relative;
+  overflow-x: hidden;
+  /* overflow: hidden; */
+}
+
+@keyframes tenbaihatchay {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.btn_logout {
+  margin-left: 35vh;
+  margin-top: 3vh;
+  cursor: pointer;
+}
+
+/* Menu css  */
+.btn_menu_mobile {
+  display: none;
+}
+
+/* avatar user  */
+.user_avatar img {
+  border-radius: 50%;
+  width: 50%;
+  margin: auto;
+}
+
+.chat-container {
+  min-height: 470px;
+  max-height: 470px;
+  overflow-y: auto;
+}
+
+.direct-chat .card-body {
+  overflow: hidden !important;
+}
+
+.styles_scrollable-div__prSCv {
+  height: 250px !important;
+  padding: 10px;
+}
+
+/* emoji  */
+.ant-modal.css-dev-only-do-not-override-ph9edi.ntl_modal_emoji {
+  left: 25%;
+}
+em-emoji-picker {
+  height: 50vh;
+}
+
+/**
+ * ==============================================
+ * dot loading khung chat
+ * ==============================================
+ */
+.dot-flashing {
+  position: relative;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+  margin-left: 15px;
+  top: 14px;
+}
+.dot-flashing::before,
+.dot-flashing::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-flashing::before {
+  left: -10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+.dot-flashing::after {
+  left: 10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background-color: #9880ff;
+  color: #9880ff;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+.custom-modal-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes dot-flashing {
+  0% {
+    background-color: #9880ff;
+  }
+  50%,
+  100% {
+    background-color: rgba(152, 128, 255, 0.2);
+  }
+}
+.typing {
+  display: flex;
+  margin-left: 10px;
+}
+
+/* Khung chat  */
+.direct-chat-warning .right > .direct-chat-text {
+  background-color: #e5efff !important;
+  border-color: #e5efff !important;
+}
+.direct-chat-warning .right > .direct-chat-text::after,
+.direct-chat-warning .right > .direct-chat-text::before {
+  border-left-color: #e5efff !important;
+}
+
+@media only screen and (max-width: 767px) {
+  .btn_menu_mobile {
+    display: block;
+  }
+  .btn_logout {
+    margin-left: 20vh;
+    margin-top: 3vh;
+    cursor: pointer;
+  }
+  label.nav {
+    display: none;
+  }
+}
+
+/* End menu css  */
+@media only screen and (max-width: 600px) {
+  /* .ant-modal.css-dev-only-do-not-override-ph9edi {
+  top: 57% !important;
+  right: 100px !important;
+  height: 475px;
+}
+.open-modal-music {
+  top: 580px;
+  right: 7px;
+} */
+}

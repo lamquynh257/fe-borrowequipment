@@ -24,6 +24,7 @@
     "@iconify/react": "^4.1.0",
     "@mui/icons-material": "^5.14.19",
     "@mui/material": "^5.14.20",
+    "@mui/x-data-grid": "^6.19.6",
     "@prisma/client": "^5.6.0",
     "@reduxjs/toolkit": "^1.9.3",
     "@south-paw/react-vector-maps": "^3.2.0",

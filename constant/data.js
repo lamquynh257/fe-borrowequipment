@@ -8,6 +8,16 @@ export const menuItems = [
     icon: "heroicons-outline:users",
     link: "/",
   },
+  {
+    title: "Cơ sở",
+    icon: "svg-spinners:blocks-wave",
+    link: "/branch",
+  },
+  {
+    title: "Thiết bị",
+    icon: "line-md:computer-twotone",
+    link: "/equipment",
+  },
 ];
 
 export const topMenu = [

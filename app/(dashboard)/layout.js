@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import Header from "@/components/partials/header";
 import Sidebar from "@/components/partials/sidebar";
@@ -27,6 +27,7 @@ import useNavbarType from "@/hooks/useNavbarType";
 import { motion, AnimatePresence } from "framer-motion";
 import Loading from "@/components/Loading";
 import { useSession } from "next-auth/react";
+
 export default function RootLayout({ children }) {
   const { width, breakpoints } = useWidth();
   const [collapsed] = useSidebar();
@@ -39,11 +40,14 @@ export default function RootLayout({ children }) {
 
   // Check login
   const { data: session, status } = useSession();
-  // console.log(session);
+  // console.log(session?.user.roleid);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
+    }
+    if (session?.user.roleid === "sinhvien") {
+      router.push("/user");
     }
   }, [status]);
 

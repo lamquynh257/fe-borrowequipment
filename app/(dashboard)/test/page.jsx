@@ -1,772 +1,328 @@
-"use client";
-import useSWR, { useSWRConfig } from "swr";
-import React, { useCallback, useMemo, useState } from "react";
-import { MaterialReactTable } from "material-react-table";
+import { useMemo, useState } from "react";
 import {
-  Avatar,
+  MRT_EditActionButtons,
+  MaterialReactTable,
+  // createRow,
+  useMaterialReactTable,
+} from "material-react-table";
+import {
   Box,
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
-  MenuItem,
-  Stack,
-  TextField,
   Tooltip,
-  Select,
-  InputLabel,
-  FormControl,
 } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { blue, green, purple } from "@mui/material/colors";
-import useDarkMode from "@/hooks/useDarkMode";
-import Chip from "@mui/material/Chip";
-import FaceIcon from "@mui/icons-material/Face";
-import { storeZus } from "@/store/store";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { Input, Modal, Popconfirm, Tag } from "antd";
-import * as XLSX from "xlsx";
-import { useEffect } from "react";
-import Loading from "@/components/Loading";
-import { useRouter } from "next/navigation";
-import unidecode from "unidecode";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { fakeData, usStates } from "./makeData";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const status = [];
-
-export default function Computer() {
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-
+const Example = () => {
   const [validationErrors, setValidationErrors] = useState({});
-  const [modalImport, setModalImport] = useState(false);
-  const [servers, setServers] = useState([]);
-
-  const router = useRouter();
-  const [isDark] = useDarkMode();
-  // console.log(isDark);
-  const { mutate } = useSWRConfig();
-
-  const { cosoState, equipmentTypeState } = storeZus((state) => state);
-  const user = storeZus((state) => state.userState.data);
-  const getcoso = storeZus((state) => state.getCoso);
-  console.log(equipmentTypeState);
-
-  const theme = createTheme({
-    palette: {
-      mode: isDark ? "dark" : "light",
-      primary: {
-        main: blue[500],
-      },
-      secondary: {
-        main: blue[500],
-      },
-      background: {
-        default: isDark ? "rgb(30 41 59)" : "#fff",
-        paper: isDark ? "rgb(30 41 59)" : "#fff",
-      },
-    },
-  });
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      const importedUsers = jsonData.slice(1).map((row) => ({
-        name: row[1],
-        model: row[2],
-        coso: row[3],
-        phongban: row[4],
-        vitri: row[5],
-        servicetag: row[6],
-        ngaymua: row[7],
-        ngayhethanbaohanh: row[8],
-      }));
-      setServers(importedUsers);
-      setModalImport(true);
-    };
-
-    reader.readAsArrayBuffer(file);
-  };
-  const handleImport = () => {
-    servers.forEach((server) => {
-      axios
-        .post(
-          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/createcoso`,
-          {
-            coso: server.coso,
-          },
-          {
-            headers: {
-              Authorization: process.env.NEXT_PUBLIC_BACKEND_AUTHEN,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        )
-        .then((response) => {
-          // Xử lý thành công
-          setServers([]);
-          setModalImport(false);
-          toast.success("Tạo thành công.", {
-            position: "top-right",
-            autoClose: 1500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          mutate(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallbranch`);
-        })
-        .catch((error) => {
-          // Xử lý lỗi
-          setServers([]);
-          setModalImport(false);
-          toast.error("Trùng tên.", {
-            position: "top-right",
-            autoClose: 1500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-        });
-    });
-  };
-  const exportExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Example Data");
-    XLSX.writeFile(workbook, "AP-list.xlsx");
-  };
-
-  const handleCreateNewRow = async (values) => {
-    // console.log(values)
-    await axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/createequipment`,
-        {
-          name: values.name,
-          image: values.image,
-          branchname: values.branchname,
-          type: values.type,
-          code: values.code,
-          status: values.status,
-          note: values.note,
-          quantity: values.quantity,
-          usenum: values.usenum,
-          usetime: values.usetime,
-          code: values.code,
-          createdby: user.username,
-        },
-        {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_BACKEND_AUTHEN,
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-      .then(() => {
-        getcoso(); //update lại store
-        toast.success("Tạo thành công.", {
-          position: "top-right",
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        mutate(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallequipment`);
-      })
-      .catch(() => {
-        toast.error("Tạo thất bại.", {
-          position: "top-right",
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      });
-  };
-
-  const handleSaveRowEdits = async ({ exitEditingMode, row, values }) => {
-    // console.log(values);
-    // console.log("row:", row.original.id);
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/editequipment`,
-        {
-          id: values.id,
-          image: req.values.image,
-          name: req.values.name,
-          type: req.values.type,
-          code: req.values.code,
-          status: req.values.status,
-          note: req.values.note,
-          quantity: req.values.quantity,
-          usenum: req.values.usenum,
-          usetime: req.values.usetime,
-          updatedby: user.username,
-        },
-        {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_BACKEND_AUTHEN,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      )
-      .then(() => {
-        getcoso(); //update lại store
-        exitEditingMode(); //required to exit editing mode and close modal
-        toast.success("Sửa thành công.", {
-          position: "top-right",
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        mutate(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallbranch`);
-      })
-      .catch((e) => {
-        exitEditingMode(); //required to exit editing mode and close modal
-        toast.error("Sửa thất bại.", {
-          position: "top-right",
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      });
-  };
-
-  const handleCancelRowEdits = () => {
-    setValidationErrors({});
-  };
-
-  const handleDelete = async (row) => {
-    // console.log(row);
-    await axios
-      .post(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/deleteCoso`,
-        {
-          id: row.original.id,
-        },
-        {
-          headers: {
-            Authorization: process.env.NEXT_PUBLIC_BACKEND_AUTHEN,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      )
-      .then((r) => {
-        getcoso(); //update lại store
-        toast.success("Xoá thành công.", {
-          position: "top-right",
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        mutate(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallcoso`);
-      })
-      .catch((err) => {
-        toast.error("Xoá thất bại.", {
-          position: "top-right",
-          autoClose: 1500,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-      });
-  };
-
-  const getCommonEditTextFieldProps = useCallback(
-    (cell) => {
-      return {
-        error: !!validationErrors[cell.id],
-        helperText: validationErrors[cell.id],
-        onBlur: (event) => {
-          const isValid =
-            cell.column.id === "email"
-              ? validateEmail(event.target.value)
-              : cell.column.id === "age"
-              ? validateAge(+event.target.value)
-              : validateRequired(event.target.value);
-          if (!isValid) {
-            //set validation error for cell if invalid
-            setValidationErrors({
-              ...validationErrors,
-              [cell.id]: `${cell.column.columnDef.header} is required`,
-            });
-          } else {
-            //remove validation error for cell if valid
-            delete validationErrors[cell.id];
-            setValidationErrors({
-              ...validationErrors,
-            });
-          }
-        },
-      };
-    },
-    [validationErrors]
-  );
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0]; // Lấy file đầu tiên từ sự kiện onChange
-    // console.log(file);
-    setAvatar(file);
-  };
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "index",
-        header: "#",
-        Cell: ({ cell, row }) => {
-          return <div>{parseInt(row.id) + 1}</div>;
-        },
-        // enableColumnActions: false,
-        // enableEditing: false,
-        // enableResizing: false,
-        size: 50,
-        Edit: ({ cell, column, table }) => <></>, //Ẩn khi edit
-      },
-      {
         accessorKey: "id",
-        header: "ID",
-        size: 20,
+        header: "Id",
         enableEditing: false,
-      },
-      {
-        accessorKey: "image",
-        header: "",
         size: 80,
-        muiTableBodyCellEditTextFieldProps: ({ cell }) => ({
-          ...getCommonEditTextFieldProps(cell),
-        }),
-        Cell: ({ cell }) => (
-          <Stack direction="row" spacing={2}>
-            <Avatar
-              variant="square"
-              alt=""
-              src={`${process.env.NEXT_PUBLIC_BACKEND_API}/equipment/${cell.row.original.image}`}
-            />
-          </Stack>
-        ),
-        Edit: ({ cell, column, table }) => (
-          <Box>
-            <InputLabel>Hình ảnh</InputLabel>
-            <input type="file" onChange={handleFileUpload} />
-          </Box>
-        ),
       },
       {
-        accessorKey: "name",
-        header: "Tên thiết bị",
-        size: 150,
-      },
-      {
-        accessorKey: "quantity",
-        header: "Số lượng",
-        size: 150,
-        Footer: () => (
-          <Stack>
-            Tổng tồn:
-            <Box color="warning.main">Test</Box>
-          </Stack>
-        ),
-      },
-      {
-        accessorKey: "code",
-        header: "Mã",
-        size: 100,
-      },
-
-      {
-        accessorFn: (row) => `${row.branchinfo.name}`,
-        header: "Chi nhánh",
-        size: 150,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          // console.log(row);
-          return <span>{cell.row.original.branchinfo?.name}</span>;
-        },
-
-        muiTableBodyCellEditTextFieldProps: {
-          select: true, //change to select for a dropdown
-          children: cosoState?.data?.map((state) => (
-            <MenuItem key={state.name} value={state.name}>
-              {state.name}
-            </MenuItem>
-          )),
+        accessorKey: "firstName",
+        header: "First Name",
+        muiEditTextFieldProps: {
+          required: true,
+          error: !!validationErrors?.firstName,
+          helperText: validationErrors?.firstName,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              firstName: undefined,
+            }),
+          //optionally add validation checking for onBlur or onChange
         },
       },
       {
-        accessorKey: "type",
-        header: "Phân loại",
-        size: 150,
-        Cell: ({ cell }) => (
-          <Stack direction="row" spacing={2}>
-            {cell.row.original.typeinfo?.name}
-          </Stack>
-        ),
-      },
-      {
-        accessorKey: "usenum",
-        header: "Số lần cho mượn",
-        size: 150,
-      },
-      {
-        accessorKey: "usetime",
-        header: "Thời gian cho mượn",
-        size: 150,
-      },
-
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        size: 120,
-        Cell: ({ cell }) => {
-          return (
-            <div>
-              <Chip
-                label={cell.getValue()}
-                color="success"
-                variant="outlined"
-              />
-            </div>
-          );
+        accessorKey: "lastName",
+        header: "Last Name",
+        muiEditTextFieldProps: {
+          required: true,
+          error: !!validationErrors?.lastName,
+          helperText: validationErrors?.lastName,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              lastName: undefined,
+            }),
         },
       },
       {
-        accessorKey: "createdby",
-        header: "Người tạo",
-        enableEditing: false,
-        size: 120,
-        Cell: ({ cell }) => {
-          return (
-            <div>
-              <Chip
-                label={cell.getValue()}
-                color="primary"
-                variant="outlined"
-                icon={<FaceIcon />}
-              />
-            </div>
-          );
+        accessorKey: "email",
+        header: "Email",
+        muiEditTextFieldProps: {
+          type: "email",
+          required: true,
+          error: !!validationErrors?.email,
+          helperText: validationErrors?.email,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              email: undefined,
+            }),
+        },
+      },
+      {
+        accessorKey: "state",
+        header: "State",
+        editVariant: "select",
+        editSelectOptions: usStates,
+        muiEditTextFieldProps: {
+          select: true,
+          error: !!validationErrors?.state,
+          helperText: validationErrors?.state,
         },
       },
     ],
-    []
+    [validationErrors]
   );
-  const fetcher = (url) =>
-    axios
-      .get(url, {
-        headers: {
-          Authorization: "Basic YWRtaW46VGhhbmhsYW0xMjM=",
-        },
-      })
-      .then((res) => res.data);
+
+  //call CREATE hook
+  const { mutateAsync: createUser, isPending: isCreatingUser } =
+    useCreateUser();
+  //call READ hook
   const {
-    data: allEquipType,
-    error: EquipTypeEr,
-    isLoading: typeLoading,
-  } = useSWR(
-    `${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallequipmenttype`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+    data: fetchedUsers = [],
+    isError: isLoadingUsersError,
+    isFetching: isFetchingUsers,
+    isLoading: isLoadingUsers,
+  } = useGetUsers();
+  //call UPDATE hook
+  const { mutateAsync: updateUser, isPending: isUpdatingUser } =
+    useUpdateUser();
+  //call DELETE hook
+  const { mutateAsync: deleteUser, isPending: isDeletingUser } =
+    useDeleteUser();
+
+  //CREATE action
+  const handleCreateUser = async ({ values, table }) => {
+    const newValidationErrors = validateUser(values);
+    if (Object.values(newValidationErrors).some((error) => error)) {
+      setValidationErrors(newValidationErrors);
+      return;
     }
-  );
-
-  const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallequipment`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-  if (error) return "Lỗi khi tải dữ liệu.";
-  if (isLoading) return <Loading />;
-  if (EquipTypeEr) return "Lỗi khi tải dữ liệu.";
-  if (typeLoading) return <Loading />;
-  // console.log(allEquipType);
-
-  // console.log(data);
-
-  return (
-    <div>
-      {/* Modal import  */}
-      <Modal
-        title="Import data"
-        visible={modalImport}
-        onCancel={() => {
-          setServers([]);
-          setModalImport(false);
-        }}
-        onOk={handleImport}
-      >
-        <div>
-          <Input type="file" accept=".xlsx" onChange={handleFileChange} />
-          {servers?.length > 0 && (
-            <>
-              <p>Danh sách đã import:</p>
-              <ul>
-                {servers.map((server, index) => (
-                  <li key={index}>
-                    {server.name} - {server.vitri}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      </Modal>
-      {/* <div style={{ display: "flex", flexDirection: "row-reverse" }}>
-        <Button onClick={() => setModalImport(true)}>Import</Button>
-        <Button onClick={exportExcel}>Export</Button>
-      </div> */}
-      <ThemeProvider theme={theme}>
-        <MaterialReactTable
-          displayColumnDefOptions={{
-            "mrt-row-actions": {
-              muiTableHeadCellProps: {
-                align: "center",
-              },
-              header: "Action",
-              size: 80,
-            },
-          }} //Thay đổi css cho cột Action
-          columns={columns}
-          data={data}
-          editingMode="modal" //default
-          enableColumnResizing
-          enableStickyHeader
-          // enableStickyFooter
-          // enableColumnOrdering
-          enableEditing
-          initialState={
-            ({ columnVisibility: { id: false } }, { showColumnFilters: true })
-          } // Ẩn cột id khi tạo mới
-          onEditingRowSave={handleSaveRowEdits}
-          onEditingRowCancel={handleCancelRowEdits}
-          // muiTableContainerProps={{ sx: { maxHeight: "500px" } }}
-          renderRowActions={({ row, table }) => (
-            <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-              <Tooltip arrow placement="left" title="Edit">
-                <IconButton onClick={() => table.setEditingRow(row)}>
-                  <Edit />
-                </IconButton>
-              </Tooltip>
-
-              <Popconfirm
-                title={`Bạn muốn xoá : ${row.original.coso}`}
-                onConfirm={() => handleDelete(row)}
-                okText="Yes"
-                cancelText="No"
-              >
-                <IconButton>
-                  <Delete />
-                </IconButton>
-              </Popconfirm>
-            </Box>
-          )}
-          renderTopToolbarCustomActions={() => (
-            <>
-              <div>
-                <Button
-                  color="secondary"
-                  onClick={() => setCreateModalOpen(true)}
-                  variant="contained"
-                >
-                  + New
-                </Button>
-
-                <Button onClick={() => setModalImport(true)}>Import</Button>
-                <Button onClick={exportExcel}>Export</Button>
-              </div>
-            </>
-          )}
-        />
-        <CreateNewAccountModal
-          columns={columns}
-          open={createModalOpen}
-          onClose={() => setCreateModalOpen(false)}
-          onSubmit={handleCreateNewRow}
-          branchs={cosoState?.data}
-          equipType={allEquipType}
-        />
-      </ThemeProvider>
-    </div>
-  );
-}
-
-export const CreateNewAccountModal = ({
-  open,
-  columns,
-  onClose,
-  onSubmit,
-  branchs,
-  equipType,
-}) => {
-  const [values, setValues] = useState(() =>
-    columns.reduce((acc, column) => {
-      acc[column.accessorKey ?? ""] = "";
-      return acc;
-    }, {})
-  );
-  const filteredColumns = columns.filter(
-    (item) =>
-      item.accessorKey !== "index" &&
-      item.accessorKey !== "action" &&
-      item.accessorKey !== "id" &&
-      item.accessorKey !== "createdby" &&
-      item.accessorKey !== "branchname" &&
-      item.accessorKey !== "image" &&
-      item.accessorKey !== "type"
-  );
-
-  const handleSubmit = () => {
-    //put your validation logic here
-    onSubmit(values);
-    onClose();
+    setValidationErrors({});
+    await createUser(values);
+    table.setCreatingRow(null); //exit creating mode
   };
 
-  return (
-    <Dialog open={open}>
-      <DialogTitle textAlign="center">Create New</DialogTitle>
-      <DialogContent>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <Stack
-            sx={{
-              width: "100%",
-              minWidth: { xs: "300px", sm: "360px", md: "400px" },
-              gap: "1.5rem",
-            }}
-          >
-            {filteredColumns.map((column) => (
-              <>
-                {column.accessorKey === "quantity" && (
-                  <>
-                    <Box>
-                      <InputLabel>Hình ảnh</InputLabel>
-                      <input
-                        type="file"
-                        onChange={(e) =>
-                          setValues({ ...values, image: e.target.files[0] })
-                        }
-                      />
-                    </Box>
-                    <FormControl>
-                      <InputLabel id="ntl-coso">Chi nhánh</InputLabel>
-                      <Select
-                        labelId="ntl-coso"
-                        id="ntl-coso"
-                        value={values.branchname}
-                        label="Chi nhánh"
-                        onChange={(e) =>
-                          setValues({
-                            ...values,
-                            branchname: e.target.value,
-                          })
-                        }
-                      >
-                        <MenuItem value="">
-                          <em>None</em>
-                        </MenuItem>
-                        {branchs?.map((state) => (
-                          <MenuItem key={state.id} value={state.id}>
-                            {state.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </>
-                )}
-                {column.accessorKey === "code" && (
-                  <>
-                    <FormControl>
-                      <InputLabel id="ntl-type">Phân loại</InputLabel>
-                      <Select
-                        labelId="ntl-type"
-                        id="ntl-type"
-                        value={values.type}
-                        label="Phân loại"
-                        onChange={(e) =>
-                          setValues({
-                            ...values,
-                            type: e.target.value,
-                          })
-                        }
-                      >
-                        <MenuItem value="">
-                          <em>None</em>
-                        </MenuItem>
-                        {equipType?.map((state) => (
-                          <MenuItem key={state.id} value={state.id}>
-                            {state.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </>
-                )}
-                <TextField
-                  key={column.accessorKey}
-                  label={column.header}
-                  name={column.accessorKey}
-                  onChange={(e) =>
-                    setValues({ ...values, [e.target.name]: e.target.value })
-                  }
-                />
-              </>
-            ))}
-          </Stack>
-        </form>
-      </DialogContent>
-      <DialogActions sx={{ p: "1.25rem" }}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button color="secondary" onClick={handleSubmit} variant="contained">
-          Save
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
+  //UPDATE action
+  const handleSaveUser = async ({ values, table }) => {
+    const newValidationErrors = validateUser(values);
+    if (Object.values(newValidationErrors).some((error) => error)) {
+      setValidationErrors(newValidationErrors);
+      return;
+    }
+    setValidationErrors({});
+    await updateUser(values);
+    table.setEditingRow(null); //exit editing mode
+  };
+
+  //DELETE action
+  const openDeleteConfirmModal = (row) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      deleteUser(row.original.id);
+    }
+  };
+
+  const table = useMaterialReactTable({
+    columns,
+    data: fetchedUsers,
+    createDisplayMode: "modal", //default ('row', and 'custom' are also available)
+    editDisplayMode: "modal", //default ('row', 'cell', 'table', and 'custom' are also available)
+    enableEditing: true,
+    getRowId: (row) => row.id,
+    muiToolbarAlertBannerProps: isLoadingUsersError
+      ? {
+          color: "error",
+          children: "Error loading data",
+        }
+      : undefined,
+    muiTableContainerProps: {
+      sx: {
+        minHeight: "500px",
+      },
+    },
+    onCreatingRowCancel: () => setValidationErrors({}),
+    onCreatingRowSave: handleCreateUser,
+    onEditingRowCancel: () => setValidationErrors({}),
+    onEditingRowSave: handleSaveUser,
+    //optionally customize modal content
+    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <>
+        <DialogTitle variant="h3">Create New User</DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+        >
+          {internalEditComponents} {/* or render custom edit components here */}
+        </DialogContent>
+        <DialogActions>
+          <MRT_EditActionButtons variant="text" table={table} row={row} />
+        </DialogActions>
+      </>
+    ),
+    //optionally customize modal content
+    renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <>
+        <DialogTitle variant="h3">Edit User</DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+        >
+          {internalEditComponents} {/* or render custom edit components here */}
+        </DialogContent>
+        <DialogActions>
+          <MRT_EditActionButtons variant="text" table={table} row={row} />
+        </DialogActions>
+      </>
+    ),
+    renderRowActions: ({ row, table }) => (
+      <Box sx={{ display: "flex", gap: "1rem" }}>
+        <Tooltip title="Edit">
+          <IconButton onClick={() => table.setEditingRow(row)}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    ),
+    renderTopToolbarCustomActions: ({ table }) => (
+      <Button
+        variant="contained"
+        onClick={() => {
+          table.setCreatingRow(true); //simplest way to open the create row modal with no default values
+          //or you can pass in a row object to set default values with the `createRow` helper function
+          // table.setCreatingRow(
+          //   createRow(table, {
+          //     //optionally pass in default values for the new row, useful for nested data or other complex scenarios
+          //   }),
+          // );
+        }}
+      >
+        Create New User
+      </Button>
+    ),
+    state: {
+      isLoading: isLoadingUsers,
+      isSaving: isCreatingUser || isUpdatingUser || isDeletingUser,
+      showAlertBanner: isLoadingUsersError,
+      showProgressBars: isFetchingUsers,
+    },
+  });
+
+  return <MaterialReactTable table={table} />;
 };
+
+//CREATE hook (post new user to api)
+function useCreateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (user) => {
+      //send api update request here
+      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      return Promise.resolve();
+    },
+    //client side optimistic update
+    onMutate: (newUserInfo) => {
+      queryClient.setQueryData(["users"], (prevUsers) => [
+        ...prevUsers,
+        {
+          ...newUserInfo,
+          id: (Math.random() + 1).toString(36).substring(7),
+        },
+      ]);
+    },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+  });
+}
+
+//READ hook (get users from api)
+function useGetUsers() {
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      //send api request here
+      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      return Promise.resolve(fakeData);
+    },
+    refetchOnWindowFocus: false,
+  });
+}
+
+//UPDATE hook (put user in api)
+function useUpdateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (user) => {
+      //send api update request here
+      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      return Promise.resolve();
+    },
+    //client side optimistic update
+    onMutate: (newUserInfo) => {
+      queryClient.setQueryData(["users"], (prevUsers) =>
+        prevUsers?.map((prevUser) =>
+          prevUser.id === newUserInfo.id ? newUserInfo : prevUser
+        )
+      );
+    },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+  });
+}
+
+//DELETE hook (delete user in api)
+function useDeleteUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId) => {
+      //send api update request here
+      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      return Promise.resolve();
+    },
+    //client side optimistic update
+    onMutate: (userId) => {
+      queryClient.setQueryData(["users"], (prevUsers) =>
+        prevUsers?.filter((user) => user.id !== userId)
+      );
+    },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+  });
+}
+
+const queryClient = new QueryClient();
+
+const ExampleWithProviders = () => (
+  //Put this with your other react-query providers near root of your app
+  <QueryClientProvider client={queryClient}>
+    <Example />
+  </QueryClientProvider>
+);
+
+export default ExampleWithProviders;
 
 const validateRequired = (value) => !!value.length;
 const validateEmail = (email) =>
@@ -776,4 +332,13 @@ const validateEmail = (email) =>
     .match(
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
-const validateAge = (age) => age >= 18 && age <= 50;
+
+function validateUser(user) {
+  return {
+    firstName: !validateRequired(user.firstName)
+      ? "First Name is Required"
+      : "",
+    lastName: !validateRequired(user.lastName) ? "Last Name is Required" : "",
+    email: !validateEmail(user.email) ? "Incorrect Email Format" : "",
+  };
+}

@@ -4,19 +4,61 @@ export const menuItems = [
     title: "Menu",
   },
   {
-    title: "Thông tin cá nhân",
-    icon: "heroicons-outline:users",
+    title: "Home",
+    icon: "material-symbols:space-dashboard-sharp",
     link: "/",
   },
   {
-    title: "Cơ sở",
-    icon: "svg-spinners:blocks-wave",
+    title: "Chi nhánh",
+    icon: "eos-icons:compass",
     link: "/branch",
   },
   {
-    title: "Thiết bị",
-    icon: "line-md:computer-twotone",
-    link: "/equipment",
+    title: "Thiết bị đang cho mượn",
+    icon: "eos-icons:hourglass",
+    link: "/borrow",
+  },
+  {
+    title: "Kho",
+    icon: "eos-icons:installing",
+    link: "#",
+    child: [
+      {
+        childtitle: "Thiết bị",
+        childlink: "/equipment",
+      },
+      {
+        childtitle: "Danh mục",
+        childlink: "/category",
+      },
+    ],
+  },
+  {
+    title: "Cài đặt",
+    icon: "eos-icons:rotating-gear",
+    link: "#",
+    child: [
+      {
+        childtitle: "Thống kê",
+        childlink: "/report",
+      },
+      {
+        childtitle: "Thông tin cá nhân",
+        childlink: "/userinfo",
+      },
+    ],
+  },
+];
+
+export const menuUser = [
+  {
+    isHeadr: true,
+    title: "Menu",
+  },
+  {
+    title: "Thông tin cá nhân",
+    icon: "line-md:account-small",
+    link: "/user",
   },
 ];
 

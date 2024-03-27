@@ -1,7 +1,8 @@
+"use client";
 import React, { useRef, useEffect, useState } from "react";
 import SidebarLogo from "./Logo";
 import Navmenu from "./Navmenu";
-import { menuItems } from "@/constant/data";
+import { menuItems, menuUser } from "@/constant/data";
 import SimpleBar from "simplebar-react";
 import useSidebar from "@/hooks/useSidebar";
 import useSemiDark from "@/hooks/useSemiDark";
@@ -61,6 +62,7 @@ const Sidebar = () => {
           scrollableNodeProps={{ ref: scrollableNodeRef }}
         >
           <Navmenu menus={menuItems} />
+
           {!collapsed && (
             <div className="bg-slate-900 mb-16 mt-24 p-4 text-center rounded-2xl text-white -bottom-5 absolute">
               <img
@@ -71,16 +73,16 @@ const Sidebar = () => {
               <div className="max-w-[160px] mx-auto mt-6">
                 <div className="widget-title">Xin chào!</div>
                 <div className="text-xs font-light">
-                  Để tạo thẻ truy cập vào link https://taodanhthiep.ntt.edu.vn/
+                  Để được hỗ trợ vui lòng liên hệ: 333
                 </div>
               </div>
-              <div className="mt-6">
+              {/* <div className="mt-6">
                 <button className="btn bg-white hover:bg-opacity-80 text-slate-900 btn-sm w-full block">
                   <a href="https://taodanhthiep.ntt.edu.vn/" target="blank">
                     Go!
                   </a>
                 </button>
-              </div>
+              </div> */}
             </div>
           )}
         </SimpleBar>

@@ -30,24 +30,24 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Input, Modal, Popconfirm, Tag } from "antd";
 import * as XLSX from "xlsx";
-import { useEffect } from "react";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
+import { statusEquip } from "@/constant/status";
 
-const status = [
-  {
-    name: "Sẵn sàng",
-  },
-  {
-    name: "Đang bảo trì",
-  },
-  {
-    name: "Đang cho mượn",
-  },
-  {
-    name: "Hết hạn dùng",
-  },
-];
+// const status = [
+//   {
+//     name: "Sẵn sàng",
+//   },
+//   {
+//     name: "Đang bảo trì",
+//   },
+//   {
+//     name: "Đang cho mượn",
+//   },
+//   {
+//     name: "Hết hạn dùng",
+//   },
+// ];
 
 export default function Computer() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -179,9 +179,9 @@ export default function Computer() {
           code: values.code,
           status: values.status,
           note: values.note,
-          quantity: values.quantity,
-          usenum: values.usenum,
-          usetime: values.usetime,
+          // quantity: values.quantity,
+          // usenum: values.usenum,
+          // usetime: values.usetime,
           code: values.code,
           createdby: user.username,
         },
@@ -194,7 +194,6 @@ export default function Computer() {
         }
       )
       .then(() => {
-        getcoso(); //update lại store
         toast.success("Tạo thành công.", {
           position: "top-right",
           autoClose: 1500,
@@ -207,8 +206,9 @@ export default function Computer() {
         });
         mutate(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallequipment`);
       })
-      .catch(() => {
-        toast.error("Tạo thất bại.", {
+      .catch((err) => {
+        console.log(err);
+        toast.error(`Tạo thất bại. ${err}`, {
           position: "top-right",
           autoClose: 1500,
           hideProgressBar: false,
@@ -250,7 +250,7 @@ export default function Computer() {
         }
       )
       .then(() => {
-        getcoso(); //update lại store
+        // getcoso(); //update lại store
         exitEditingMode(); //required to exit editing mode and close modal
         toast.success("Sửa thành công.", {
           position: "top-right",
@@ -312,7 +312,7 @@ export default function Computer() {
         mutate(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallequipment`);
       })
       .catch((err) => {
-        toast.error("Xoá thất bại.", {
+        toast.error(`Xoá thất bại: ${err.response.data}`, {
           position: "top-right",
           autoClose: 1500,
           hideProgressBar: false,
@@ -428,12 +428,7 @@ export default function Computer() {
         accessorKey: "quantity",
         header: "Số lượng",
         size: 150,
-        Footer: () => (
-          <Stack>
-            Tổng tồn:
-            <Box color="warning.main">Test</Box>
-          </Stack>
-        ),
+        Edit: ({ cell, column, table }) => <></>,
       },
       {
         accessorKey: "code",
@@ -447,8 +442,6 @@ export default function Computer() {
         header: "Chi nhánh",
         size: 150,
         Cell: ({ cell }) => {
-          const row = cell.getValue();
-          // console.log(row);
           return <span>{cell.row.original.branchinfo?.name}</span>;
         },
 
@@ -484,10 +477,21 @@ export default function Computer() {
         accessorKey: "usenum",
         header: "Số lần cho mượn",
         size: 150,
+        Edit: ({ cell, column, table }) => <></>,
       },
       {
         accessorKey: "usetime",
         header: "Thời gian cho mượn",
+        size: 150,
+        Edit: ({ cell, column, table }) => <></>,
+        // Cell: ({ cell }) => {
+        //   const result = parseTimeStringToHours(cell.getValue());
+        //   return <>{result}</>;
+        // },
+      },
+      {
+        accessorKey: "note",
+        header: "Ghi chú",
         size: 150,
       },
 
@@ -508,7 +512,7 @@ export default function Computer() {
         },
         muiTableBodyCellEditTextFieldProps: {
           select: true, //change to select for a dropdown
-          children: status?.map((state) => (
+          children: statusEquip?.map((state) => (
             <MenuItem key={state.name} value={state.name}>
               {state.name}
             </MenuItem>
@@ -562,9 +566,7 @@ export default function Computer() {
     `${process.env.NEXT_PUBLIC_BACKEND_API}/api/getallequipment`,
     fetcher,
     {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+      refreshInterval: 1000,
     }
   );
   if (error) return "Lỗi khi tải dữ liệu.";
@@ -627,8 +629,8 @@ export default function Computer() {
           // enableColumnOrdering
           // enableEditing
           initialState={{ columnVisibility: { id: false } }} // Ẩn cột id khi tạo mới
-          // onEditingRowSave={handleSaveRowEdits}
-          // onEditingRowCancel={handleCancelRowEdits}
+          onEditingRowSave={handleSaveRowEdits}
+          onEditingRowCancel={handleCancelRowEdits}
           // muiTableContainerProps={{ sx: { maxHeight: "500px" } }}
           enableRowActions
           renderRowActionMenuItems={({ row, table }) => [
@@ -682,6 +684,7 @@ export default function Computer() {
           onSubmit={handleCreateNewRow}
           branchs={cosoState?.data}
           equipType={allEquipType}
+          statusE={statusEquip}
         />
       </ThemeProvider>
     </div>
@@ -695,6 +698,7 @@ export const CreateNewAccountModal = ({
   onSubmit,
   branchs,
   equipType,
+  statusE,
 }) => {
   const [values, setValues] = useState(() =>
     columns.reduce((acc, column) => {
@@ -708,6 +712,9 @@ export const CreateNewAccountModal = ({
       item.accessorKey !== "action" &&
       item.accessorKey !== "id" &&
       item.accessorKey !== "createdby" &&
+      item.accessorKey !== "usenum" &&
+      item.accessorKey !== "usetime" &&
+      item.accessorKey !== "quantity" &&
       item.id !== "branchname" &&
       item.accessorKey !== "image" &&
       item.id !== "type" &&
@@ -716,6 +723,26 @@ export const CreateNewAccountModal = ({
 
   const handleSubmit = () => {
     //put your validation logic here
+    if (
+      !values.branchname ||
+      !values.type ||
+      !values.status ||
+      !values.name ||
+      !values.code
+    ) {
+      //  console.log("Please input");
+      toast.error("Vui lòng nhập đầy đủ thông tin.", {
+        position: "top-center",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
     onSubmit(values);
     onClose();
   };
@@ -734,7 +761,7 @@ export const CreateNewAccountModal = ({
           >
             {filteredColumns.map((column) => (
               <>
-                {column.accessorKey === "quantity" && (
+                {column.accessorKey === "name" && (
                   <>
                     <Box>
                       <InputLabel>Hình ảnh</InputLabel>
@@ -745,6 +772,34 @@ export const CreateNewAccountModal = ({
                         }
                       />
                     </Box>
+                  </>
+                )}
+                {column.accessorKey === "note" && (
+                  <>
+                    <FormControl>
+                      <InputLabel id="ntl-type">Phân loại</InputLabel>
+                      <Select
+                        labelId="ntl-type"
+                        id="ntl-type"
+                        value={values.type}
+                        label="Phân loại"
+                        onChange={(e) =>
+                          setValues({
+                            ...values,
+                            type: e.target.value,
+                          })
+                        }
+                      >
+                        <MenuItem value="">
+                          <em>None</em>
+                        </MenuItem>
+                        {equipType?.map((state) => (
+                          <MenuItem key={state.id} value={state.id}>
+                            {state.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                     <FormControl>
                       <InputLabel id="ntl-coso">Chi nhánh</InputLabel>
                       <Select
@@ -771,35 +826,7 @@ export const CreateNewAccountModal = ({
                     </FormControl>
                   </>
                 )}
-                {column.accessorKey === "code" && (
-                  <>
-                    <FormControl>
-                      <InputLabel id="ntl-type">Phân loại</InputLabel>
-                      <Select
-                        labelId="ntl-type"
-                        id="ntl-type"
-                        value={values.type}
-                        label="Phân loại"
-                        onChange={(e) =>
-                          setValues({
-                            ...values,
-                            type: e.target.value,
-                          })
-                        }
-                      >
-                        <MenuItem value="">
-                          <em>None</em>
-                        </MenuItem>
-                        {equipType?.map((state) => (
-                          <MenuItem key={state.id} value={state.id}>
-                            {state.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </>
-                )}
-                {column.accessorKey === "usenum" && (
+                {column.accessorKey === "note" && (
                   <>
                     <FormControl>
                       <InputLabel id="ntl-status">Trạng thái</InputLabel>
@@ -815,12 +842,17 @@ export const CreateNewAccountModal = ({
                           })
                         }
                       >
-                        <MenuItem value={"Sẵn sàng"}>Sẵn sàng</MenuItem>
+                        {statusE?.map((state) => (
+                          <MenuItem key={state.id} value={state.name}>
+                            {state.name}
+                          </MenuItem>
+                        ))}
+                        {/* <MenuItem value={"Sẵn sàng"}>Sẵn sàng</MenuItem>
                         <MenuItem value={"Đang bảo trì"}>Đang bảo trì</MenuItem>
                         <MenuItem value={"Đang cho mượn"}>
                           Đang cho mượn
                         </MenuItem>
-                        <MenuItem value={"Hết hạn dùng"}>Hết hạn dùng</MenuItem>
+                        <MenuItem value={"Hết hạn dùng"}>Hết hạn dùng</MenuItem> */}
                       </Select>
                     </FormControl>
                   </>
@@ -857,3 +889,25 @@ const validateEmail = (email) =>
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 const validateAge = (age) => age >= 18 && age <= 50;
+// convert time
+const parseTimeStringToHours = (timeString) => {
+  // Kiểm tra nếu timeString là 0, trả về 0 luôn
+  if (timeString === "0") {
+    return "0.00";
+  }
+
+  // Tách chuỗi thành các thành phần riêng biệt: ngày, giờ, phút
+  const [daysString, hoursString, minutesString] =
+    timeString?.split(/ ngày, | giờ | phút/);
+
+  // Chuyển đổi thành số nguyên
+  const days = daysString ? parseInt(daysString) : 0;
+  const hours = hoursString ? parseInt(hoursString) : 0;
+  const minutes = minutesString ? parseInt(minutesString) : 0;
+
+  // Tính tổng giờ
+  const totalHours = days * 24 + hours + minutes / 60;
+
+  // Làm tròn kết quả với 2 chữ số thập phân
+  return totalHours.toFixed(2);
+};

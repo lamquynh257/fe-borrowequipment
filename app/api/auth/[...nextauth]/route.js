@@ -123,6 +123,7 @@ export const authOptions = {
           department: user.department,
           phone: user.phone,
           image: user.image,
+          roleid: user.roleid,
         };
       }
 
@@ -140,6 +141,7 @@ export const authOptions = {
           phone: token.phone,
           email: token.email,
           image: token.image,
+          roleid: token.roleid,
         },
       };
     },

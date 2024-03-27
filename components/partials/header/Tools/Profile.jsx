@@ -11,7 +11,6 @@ import { storeZus } from "@/store/store";
 
 const ProfileLabel = () => {
   const [users, setUsers] = useState();
-  const { data: session, status } = useSession();
   const user = storeZus((state) => state.userState.data);
   // console.log(user);
   // getUser(session?.user?.username);

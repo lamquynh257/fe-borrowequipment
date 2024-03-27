@@ -6,7 +6,7 @@ const nextConfig = {
         "192.168.32.68:3003",
         "192.168.0.130:3003",
         "192.168.29.53:3006",
-        "danhthiep.ntt.edu.vn",
+        "qttb-demo.ntt.edu.vn",
       ],
     },
   },

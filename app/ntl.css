@@ -1,6 +1,6 @@
-body {
+/* body {
   overflow: hidden;
-}
+} */
 
 .css-mxtnkz-MuiTableContainer-root {
   max-height: clamp(
@@ -8,6 +8,11 @@ body {
     calc(100vh - 349px),
     9999px
   ) !important;
+  /* max-height: clamp(
+    calc(100vh - 518px),
+    calc(100vh - 518px),
+    9999px px
+  ) !important; */
 }
 .ant-btn-primary {
   background-color: #1677ff;
@@ -340,4 +345,12 @@ em-emoji-picker {
   top: 580px;
   right: 7px;
 } */
+  .MuiDialogContent-root .MuiStack-root {
+    min-width: 280px;
+  }
+}
+
+/* Modal table mui react  */
+.MuiDialogContent-root .MuiStack-root {
+  padding-top: 10px;
 }

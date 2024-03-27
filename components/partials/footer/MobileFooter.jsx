@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
+import { storeZus } from "@/store/store";
 
 const MobileFooter = () => {
+  const [users, setUsers] = useState({});
+  const user = storeZus((state) => state.userState.data);
   const router = useRouter();
+  useEffect(() => {
+    setUsers(user);
+  }, [user]);
   return (
     <div className="bg-white bg-no-repeat custom-dropshadow footer-bg dark:bg-slate-700 flex justify-around items-center backdrop-filter backdrop-blur-[40px] fixed left-0 w-full z-[9999] bottom-0 py-[12px] px-4">
       <Link href="chat">
@@ -42,7 +48,7 @@ const MobileFooter = () => {
       >
         <div className="h-[50px] w-[50px] rounded-full relative left-[0px] top-[0px] custom-dropshadow">
           <img
-            src="/assets/images/users/user-1.jpg"
+            src={`${process.env.NEXT_PUBLIC_BACKEND_API}/avatar/${users?.image}`}
             alt=""
             className={` w-full h-full rounded-full
           ${

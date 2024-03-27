@@ -87,7 +87,7 @@ const RegForm = () => {
         placeholder=" Enter your Username"
         register={register}
         error={errors.name}
-        alue={data.username}
+        value={data.username}
         onChange={(e) => {
           setData({ ...data, username: e.target.value });
         }}

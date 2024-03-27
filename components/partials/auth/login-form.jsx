@@ -29,6 +29,7 @@ const LoginForm = () => {
     password: "",
   });
   const getUser = storeZus((state) => state.getUser);
+  const user = storeZus((state) => state.userState.data);
 
   const loginUser = async (e) => {
     setLoading(true);
@@ -76,9 +77,15 @@ const LoginForm = () => {
         progress: undefined,
         theme: "light",
       });
+      // console.log(user);
       setTimeout(() => {
-        // Lấy thông tin user theo quyền
-        router.push("/");
+        if (user.roleid === "sinhvien") {
+          // Lấy thông tin user theo quyền
+          router.push("/user");
+        }
+        if (user.roleid === "admin") {
+          router.push("/");
+        }
       }, 800);
       router.refresh();
     }

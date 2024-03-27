@@ -13,7 +13,7 @@ const AdLogin = async (username, password) => {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `https://api-server.ntt.edu.vn/api/loginad`,
+      url: `${process.env.NEXT_PUBLIC_BACKEND_API}/api/loginad`,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: "Basic YWRtaW46VGhhbmhsYW0xMjM=",

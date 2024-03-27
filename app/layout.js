@@ -13,6 +13,10 @@ export default function RootLayout({ children, session }) {
   return (
     <>
       <html lang="en">
+        <head>
+          <title>Mượn thiết bị</title>
+          <meta name="description" content="Code vui vẻ" />
+        </head>
         <body className="font-inter  custom-tippy dashcode-app">
           <SessionProvider session={session}>
             <Provider store={store}>{children}</Provider>

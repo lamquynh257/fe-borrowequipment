@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function POST(request) {
   const body = await request.json();
   const { username, password } = body.data;
-  console.log(body.data);
+  // console.log(body.data);
   if (!username || !password) {
     return new NextResponse("Không được để trống.", { status: 400 });
   }

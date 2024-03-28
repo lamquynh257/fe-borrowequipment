@@ -44,7 +44,7 @@ const LoginForm = () => {
     // });
     // console.log(res);
     if (res.user) {
-      const res = await axios.get(
+      const res1 = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_API}/api/finduser?username=${data.username}`,
 
         {
@@ -55,19 +55,19 @@ const LoginForm = () => {
       );
       // console.log(res.data);
       await getUser(data.username);
-      const auth = await signIn("credentials", {
-        username: data.username,
-        password: data.password,
-        redirect: false,
-      });
-      if (res.data.roleid === "sinhvien") {
-        // Lấy thông tin user theo quyền
-        router.push("/user");
-      }
-      if (res.data.roleid === "admin") {
-        router.push("/");
-      }
-      router.refresh();
+      // const auth = await signIn("credentials", {
+      //   username: data.username,
+      //   password: data.password,
+      //   redirect: false,
+      // });
+      // if (res.data.roleid === "sinhvien") {
+      //   // Lấy thông tin user theo quyền
+      //   router.push("/user");
+      // }
+      // if (res.data.roleid === "admin") {
+      //   router.push("/");
+      // }
+      // router.refresh();
 
       // setTimeout(() => {
       //   // router.push("/");
@@ -78,6 +78,36 @@ const LoginForm = () => {
       //     router.push("/");
       //   }
       // }, 1500);
+      getUser(data.username);
+      await signIn("credentials", {
+        username: data.username,
+        password: data.password,
+        department: res.user.phongban,
+        phone: res.user.mobile,
+        email: res.user.emailAddress,
+        fullname: res.user.displayName,
+        redirect: false,
+      });
+
+      toast.success("Đăng nhập thành công.", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setTimeout(() => {
+        if (res1.data.roleid === "admin") {
+          router.push("/home");
+        }
+        if (res1.data.roleid === "sinhvien") {
+          // Lấy thông tin user theo quyền
+          router.push("/user");
+        }
+      }, 800);
     } else {
       setLoading(false);
       toast.error("Sai tên đăng nhập hoặc mật khẩu.", {

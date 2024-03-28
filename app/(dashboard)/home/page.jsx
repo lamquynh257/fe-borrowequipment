@@ -6,16 +6,27 @@ import Textinput from "@/components/ui/Textinput";
 import GroupChart5 from "@/components/partials/widget/chart/group-chart5";
 import Link from "next/link";
 import SimpleBar from "simplebar-react";
+import { storeZus } from "@/store/store";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import CardSlider from "@/components/partials/widget/CardSlider";
 
-const CardSlider = dynamic(
-  () => import("@/components/partials/widget/CardSlider"),
-  {
-    ssr: false,
-  }
-);
+// const CardSlider = dynamic(
+//   () => import("@/components/partials/widget/CardSlider"),
+//   {
+//     ssr: false,
+//   }
+// );
 
 const BankingPage = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const user = storeZus((state) => state.userState.data);
+  const router = useRouter();
+  // useEffect(() => {
+  //   if (user.roleid === "sinhvien") {
+  //     router.push("/user");
+  //   }
+  // }, [user]);
   return (
     <div className="space-y-5">
       <Card>

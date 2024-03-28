@@ -6,7 +6,7 @@ export const menuItems = [
   {
     title: "Home",
     icon: "material-symbols:space-dashboard-sharp",
-    link: "/",
+    link: "/home",
   },
   {
     title: "Chi nhánh",

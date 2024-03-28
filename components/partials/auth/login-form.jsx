@@ -3,7 +3,7 @@ import Textinput from "@/components/ui/Textinput";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Checkbox from "@/components/ui/Checkbox";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
@@ -67,6 +67,7 @@ const LoginForm = () => {
       if (res.data.roleid === "admin") {
         router.push("/");
       }
+      router.refresh();
 
       // setTimeout(() => {
       //   // router.push("/");

@@ -15,6 +15,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
 import AdLogin from "@/app/api/adlogin/route";
 import { storeZus } from "@/store/store";
+import axios from "axios";
 const schema = yup
   .object({
     // email: yup.string().email("Invalid email").required("Email is Required"),
@@ -29,7 +30,6 @@ const LoginForm = () => {
     password: "",
   });
   const getUser = storeZus((state) => state.getUser);
-  const user = storeZus((state) => state.userState.data);
 
   const loginUser = async (e) => {
     setLoading(true);
@@ -43,7 +43,41 @@ const LoginForm = () => {
     //   redirect: false,
     // });
     // console.log(res);
-    if (res.message === "Đăng nhập không thành công") {
+    if (res.user) {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/finduser?username=${data.username}`,
+
+        {
+          headers: {
+            Authorization: "Basic YWRtaW46VGhhbmhsYW0xMjM=",
+          },
+        }
+      );
+      // console.log(res.data);
+      await getUser(data.username);
+      const auth = await signIn("credentials", {
+        username: data.username,
+        password: data.password,
+        redirect: false,
+      });
+      if (res.data.roleid === "sinhvien") {
+        // Lấy thông tin user theo quyền
+        router.push("/user");
+      }
+      if (res.data.roleid === "admin") {
+        router.push("/");
+      }
+
+      // setTimeout(() => {
+      //   // router.push("/");
+      //   if (res.data.roleid === "sinhvien") {
+      //     // Lấy thông tin user theo quyền
+      //     router.push("/user");
+      //   } else if (res.data.roleid === "admin") {
+      //     router.push("/");
+      //   }
+      // }, 1500);
+    } else {
       setLoading(false);
       toast.error("Sai tên đăng nhập hoặc mật khẩu.", {
         position: "top-right",
@@ -55,40 +89,59 @@ const LoginForm = () => {
         progress: undefined,
         theme: "light",
       });
-    } else {
-      getUser(data.username);
-      await signIn("credentials", {
-        username: data.username,
-        password: data.password,
-        department: res.user.phongban,
-        phone: res.user.mobile,
-        email: res.user.emailAddress,
-        fullname: res.user.displayName,
-        redirect: false,
-      });
-
-      toast.success("Đăng nhập thành công.", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      // console.log(user);
-      setTimeout(() => {
-        if (user.roleid === "sinhvien") {
-          // Lấy thông tin user theo quyền
-          router.push("/user");
-        }
-        if (user.roleid === "admin") {
-          router.push("/");
-        }
-      }, 800);
-      router.refresh();
+      setLoading(false);
     }
+    // if (res.message === "Đăng nhập không thành công") {
+    //   setLoading(false);
+    //   toast.error("Sai tên đăng nhập hoặc mật khẩu.", {
+    //     position: "top-right",
+    //     autoClose: 1500,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //     theme: "light",
+    //   });
+    // } else {
+    //   await getUser(data.username);
+    //   await signIn("credentials", {
+    //     username: data.username,
+    //     password: data.password,
+    //     department: res.user.phongban,
+    //     phone: res.user.mobile,
+    //     email: res.user.emailAddress,
+    //     fullname: res.user.displayName,
+    //     redirect: false,
+    //   });
+    //   if (user.roleid === "sinhvien") {
+    //     // Lấy thông tin user theo quyền
+    //     router.push("/user");
+    //   } else if (user.roleid === "admin") {
+    //     router.push("/");
+    //   }
+    //   // toast.success("Đăng nhập thành công.", {
+    //   //   position: "top-right",
+    //   //   autoClose: 1500,
+    //   //   hideProgressBar: false,
+    //   //   closeOnClick: true,
+    //   //   pauseOnHover: true,
+    //   //   draggable: true,
+    //   //   progress: undefined,
+    //   //   theme: "light",
+    //   // });
+    //   // console.log(user);
+    //   // setTimeout(() => {
+    //   //   if (user.roleid === "sinhvien") {
+    //   //     // Lấy thông tin user theo quyền
+    //   //     router.push("/user");
+    //   //   }
+    //   //   if (user.roleid === "admin") {
+    //   //     router.push("/");
+    //   //   }
+    //   // }, 800);
+    //   // router.refresh();
+    // }
   };
 
   const {

@@ -5,7 +5,7 @@ import { useRouter, usePathname, redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import Header from "@/components/partials/header";
 import Sidebar from "@/components/partials/usersidebar";
-import Settings from "@/components/partials/settings";
+// import Settings from "@/components/partials/settings";
 import useWidth from "@/hooks/useWidth";
 import useSidebar from "@/hooks/useSidebar";
 import useContentWidth from "@/hooks/useContentWidth";
@@ -45,9 +45,6 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
-    }
-    if (session?.user.roleid === "sinhvien") {
-      router.push("/user");
     }
   }, [status]);
 
@@ -98,7 +95,7 @@ export default function RootLayout({ children }) {
           onClick={() => setMobileMenu(false)}
         ></div>
       )}
-      <Settings />
+      {/* <Settings /> */}
       <div
         className={`content-wrapper transition-all duration-150 ${
           width > 1280 ? switchHeaderClass() : ""

@@ -7,7 +7,7 @@ const themeConfig = {
   layout: {
     isRTL: false,
     darkMode: false,
-    semiDarkMode: false,
+    semiDarkMode: true,
     skin: "default",
     contentWidth: "full",
     type: "vertical",

@@ -5,7 +5,7 @@ import { useRouter, usePathname, redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 import Header from "@/components/partials/header";
 import Sidebar from "@/components/partials/sidebar";
-import Settings from "@/components/partials/settings";
+// import Settings from "@/components/partials/settings";
 import useWidth from "@/hooks/useWidth";
 import useSidebar from "@/hooks/useSidebar";
 import useContentWidth from "@/hooks/useContentWidth";
@@ -27,6 +27,7 @@ import useNavbarType from "@/hooks/useNavbarType";
 import { motion, AnimatePresence } from "framer-motion";
 import Loading from "@/components/Loading";
 import { useSession } from "next-auth/react";
+import { storeZus } from "@/store/store";
 
 export default function RootLayout({ children }) {
   const { width, breakpoints } = useWidth();
@@ -37,7 +38,7 @@ export default function RootLayout({ children }) {
   const [navbarType] = useNavbarType();
   const [isMonoChrome] = useMonoChrome();
   const router = useRouter();
-
+  const user = storeZus((state) => state.userState.data);
   // Check login
   const { data: session, status } = useSession();
   // console.log(session?.user.roleid);
@@ -46,7 +47,7 @@ export default function RootLayout({ children }) {
     if (status === "unauthenticated") {
       router.push("/auth/login");
     }
-    if (session?.user.roleid === "sinhvien") {
+    if (user.roleid === "sinhvien") {
       router.push("/user");
     }
   }, [status]);
@@ -98,7 +99,7 @@ export default function RootLayout({ children }) {
           onClick={() => setMobileMenu(false)}
         ></div>
       )}
-      <Settings />
+      {/* <Settings /> */}
       <div
         className={`content-wrapper transition-all duration-150 ${
           width > 1280 ? switchHeaderClass() : ""

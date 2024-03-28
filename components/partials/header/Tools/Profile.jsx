@@ -51,7 +51,7 @@ const Profile = () => {
       label: "Settings",
       icon: "heroicons-outline:cog",
       action: () => {
-        router.push("/settings");
+        router.push("/userinfo");
       },
     },
     {

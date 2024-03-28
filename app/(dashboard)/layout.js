@@ -44,9 +44,9 @@ export default function RootLayout({ children }) {
   // console.log(session?.user.roleid);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
+    // if (status === "unauthenticated") {
+    //   router.push("/auth/login");
+    // }
     if (user.roleid === "sinhvien") {
       router.push("/user");
     }

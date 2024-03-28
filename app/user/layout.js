@@ -42,11 +42,11 @@ export default function RootLayout({ children }) {
   const { data: session, status } = useSession();
   // console.log(session?.user.roleid);
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
-  }, [status]);
+  // useEffect(() => {
+  //   if (status === "unauthenticated") {
+  //     router.push("/auth/login");
+  //   }
+  // }, [status]);
 
   const location = usePathname();
   // header switch class

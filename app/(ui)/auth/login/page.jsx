@@ -14,11 +14,11 @@ const Login = () => {
   const [isDark] = useDarkMode();
   const { status } = useSession();
   const router = useRouter();
-  // useEffect(() => {
-  //   if (status === "authenticated") {
-  //     router.push("/");
-  //   }
-  // }, [status]);
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/");
+    }
+  }, [status]);
   return (
     <>
       <ToastContainer />
